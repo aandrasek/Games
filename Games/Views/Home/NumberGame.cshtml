@@ -1,0 +1,258 @@
+﻿@model Games.ViewModels.NumberGameViewModel
+@{
+    ViewBag.Title = "NumberGame";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<style>
+    .numgame .container2 {
+        width: 22.8%;
+        margin: auto;
+    }
+
+    .numgame main .container2 span {
+        background: #808080;
+        width: 90px;
+        height: 90px;
+        font-size: 120px;
+        font-weight: bold;
+        color: #808080;
+        padding: 5px 5px;
+        margin: 5px;
+    }
+
+    .numbers div {
+        float: left;
+    }
+
+    .submit {
+        background: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        margin-bottom: 20px;
+    }
+
+    .align {
+        text-align: center;
+    }
+
+    .sc {
+        background: red;
+        color: #ffffff;
+        width: 300px;
+        margin: auto;
+        text-align: center;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .scr {
+        width: 300px;
+        margin: auto;
+        text-align: center;
+        border-bottom: #dddddd 2px solid;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .scorelist {
+        padding: 0;
+        width: 100px;
+        font-size: 35px;
+        margin: auto;
+        color: #808080;
+    }
+
+    ol li span {
+        color: #000000;
+    }
+
+    .red {
+        color: red
+    }
+
+    footer {
+        text-align: center;
+        color: #000000;
+        font-size: 20px;
+        padding-top: 30px;
+    }
+</style>
+
+<div class="numgame">
+    <h1 class="align"><strong>NUMBER GAME</strong></h1>
+    <main>
+        <h1 class="align">SCORE:</h1>
+        <h1 class="score align"> 0</h1>
+        <div class="container2">
+            <p><span class="b7">7</span><span class="b8">8</span><span class="b9">9</span></p>
+            <p><span class="b4">4</span><span class="b5">5</span><span class="b6">6</span></p>
+            <p><span class="b1">1</span><span class="b2">2</span><span class="b3">3</span></p>
+        </div>
+        <h3 class="start align">Press <span class="red">E</span> to start</h3>
+        <h3 class="restart align">Press <span class="red">R</span> to restart</h3>
+
+
+    </main>
+    <div class="align">
+        @using (Html.BeginForm("NumberGameBS", "Home", FormMethod.Post))
+        {
+            @Html.TextBoxFor(c => c.HighScore, new { @class = "score2", @type = "hidden" })
+            <input type="submit" class="submit" value="POST YOUR SCORE" />
+        }
+    </div>
+    <h2 class="sc">TOP 5</h2>
+    <ol class="scorelist">
+        @foreach (var item in ViewBag.scores)
+        {
+            <li class="align">
+                <span>@item.HighScore</span>
+            </li>
+        }
+    </ol>
+    <footer>&copy;Antonio Andrasek</footer>
+</div>
+<script>
+    var counter = 0;
+    var Started = false;
+    var nums = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    var gen_nums = [];
+    var pressed_num = new Array();
+    var endScore;
+
+    window.setInterval(function () {
+        if (endScore == false) {
+            if (Started == true) {
+                counter++;
+                $(".score").html(counter)
+                Check();
+            }
+        }
+        if (endScore == true) {
+            $(".score2").val(counter);
+            $(".submit").show();
+        }
+    }, 1);
+
+
+
+    function Start() {
+        endScore = false;
+        Started = true;
+
+        $(".start").hide();
+        $(".restart").show();
+
+        function in_array(array, el) {
+            for (var i = 0; i < array.length; i++)
+                if (array[i] == el) return true;
+            return false;
+        }
+
+        function get_rand(array) {
+            var rand = array[Math.floor(Math.random() * array.length)];
+            if (!in_array(gen_nums, rand)) {
+                gen_nums.push(rand);
+                return rand;
+            }
+            return get_rand(array);
+        }
+        for (var i = 1; i <= 5; i++) {
+            $(".b" + get_rand(nums)).css("color", "white");
+        }
+    }
+
+    $(document).ready(function () {
+        $(".submit").hide();
+        $(".restart").hide();
+    });
+
+    $(document).keypress(function (e) {
+        if (Started == false) {
+            if (e.keyCode == 101) {
+                Start();
+            }
+        }
+
+
+        if (Started == true) {
+
+            if (e.keyCode == 114) {
+                Restart();
+            }
+            if (e.keyCode == 49) {
+
+                $(".b1").css("background", "red");
+                pressed_num.push(1);
+            }
+            if (e.keyCode == 50) {
+                $(".b2").css("background", "red");
+                pressed_num.push(2);
+            }
+            if (e.keyCode == 51) {
+                $(".b3").css("background", "red");
+                pressed_num.push(3);
+            }
+            if (e.keyCode == 52) {
+                $(".b4").css("background", "red");
+                pressed_num.push(4);
+            }
+            if (e.keyCode == 53) {
+                $(".b5").css("background", "red");
+                pressed_num.push(5);
+            }
+            if (e.keyCode == 54) {
+                $(".b6").css("background", "red");
+                pressed_num.push(6);
+            }
+            if (e.keyCode == 55) {
+                $(".b7").css("background", "red");
+                pressed_num.push(7);
+            }
+            if (e.keyCode == 56) {
+                $(".b8").css("background", "red");
+                pressed_num.push(8);
+            }
+            if (e.keyCode == 57) {
+                $(".b9").css("background", "red");
+                pressed_num.push(9);
+            }
+        }
+    });
+
+
+    function Check() {
+        Array.prototype.compare = function (testArr) {
+            if (this.length != testArr.length) return false;
+            for (var i = 0; i < testArr.length; i++) {
+                if (this[i].compare) { //To test values in nested arrays
+                    if (!this[i].compare(testArr[i])) return false;
+                }
+                else if (this[i] !== testArr[i]) return false;
+            }
+            return true;
+        }
+        if (gen_nums.sort().compare(pressed_num.sort())) {
+            endScore = true;
+        } else {
+            $(".ab").css("color", "red");
+        }
+    }
+    function Restart() {
+        for (var i = 1; i < 10; i++) {
+            $(".b" + i).css("background", "#808080");
+            $(".b" + i).css("color", "#808080");
+        }
+        $(".submit").hide();
+        endScore == false;
+        counter = 0;
+        gen_nums = [];
+        pressed_num = [];
+        Start();
+    }
+
+
+</script>
+

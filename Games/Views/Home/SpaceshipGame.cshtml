@@ -1,0 +1,392 @@
+﻿@model Games.ViewModels.SpaceshipGameViewModel
+@{
+    ViewBag.Title = "Spaceship";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+    body {
+        background: #000000;
+    }
+
+    .spaceship {
+        height: 100px;
+        width: 100px;
+        background-image: url("/Images/spaceship.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+        position: absolute;
+        left: 925px;
+        top: 800px;
+    }
+
+    .background {
+        width: 1140px;
+        height: 780px;
+        background-image: url("/Images/bck.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+        position: absolute;
+        bottom: 50px;
+        border: #ff0000 2px solid;
+    }
+
+    .headline {
+        background: #000000;
+        height: 100px;
+        width: 100%;
+        margin: auto;
+        background-image: url("/Images/spaceheadline.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+        background-position-y: center;
+        margin-top: 10px;
+        position: relative;
+        border-bottom: #ff0000 2px solid;
+    }
+
+    .planet {
+        width: 142px;
+        height: 142px;
+        position: absolute;
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+
+    .bottom1 {
+        position: absolute;
+        background: #000000;
+        height: 155px;
+        width: 1140px;
+        top: 920px;
+        border-top: #ff0000 2px solid;
+        text-align:center;
+        color:#ffffff;
+        font-size:20px;
+        padding-top:120px;
+    }
+
+    .submit {
+        position: absolute;
+        top: 350px;
+        color: #ff0000;
+        font-weight: bold;
+        background: black;
+        border: #ff0000 2px solid;
+        font-size: 30px;
+        padding: 20px 40px;
+    }
+
+    .exit {
+        position: absolute;
+        top: 434px;
+        color: #ff0000;
+        font-weight: bold;
+        background: black;
+        border: #ff0000 2px solid;
+        font-size: 30px;
+        padding: 20px 40px;
+    }
+
+    .score {
+        position: absolute;
+        top: 170px;
+        color: #ff0000;
+        font-size: 40px;
+        font-weight: bold;
+        left: 400px;
+    }
+
+    .scorelist {
+        border: #ff0000 2px solid;
+        height: 305px;
+        width: 400px;
+        position: absolute;
+        top: 250px;
+        left: 750px;
+        background-image: url("/Images/lines.png");
+        background-repeat: no-repeat;
+        background-size: 100%;
+    }
+</style>
+<body>
+    <div class="spacegame">
+
+
+        <div class="background">
+        </div>
+
+        <div class="p1 planet"></div>
+        <div class="p2 planet"></div>
+        <div class="p3 planet"></div>
+        <div class="p4 planet"></div>
+        <div class="p5 planet"></div>
+        <div class="p6 planet"></div>
+        <div class="p7 planet"></div>
+        <div class="p8 planet"></div>
+
+        <div class="p9 planet"></div>
+        <div class="p10 planet"></div>
+        <div class="p11 planet"></div>
+        <div class="p12 planet"></div>
+        <div class="p13 planet"></div>
+        <div class="p14 planet"></div>
+        <div class="p15 planet"></div>
+        <div class="p16 planet"></div>
+
+        <div class="headline" style="margin-top:0;"></div>
+        <div class="bottom1">&copy;Antonio Andrasek</div>
+
+        <div class="score">Score:0</div>
+        <input type="button" class="submit" value="START" />
+        <input type="button" class="exit" value="EXIT" onclick="location.href = '/Home'" />
+
+        <div class="scorelist">
+            <ul style="list-style-type: none;text-align:center;padding-left:0;color:#ff0000;">
+                @foreach (var item in ViewBag.scores)
+                {
+                    <li style="font-size:35px; ">
+                        @item.HighScore
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <div class="spaceship">
+        </div>
+
+        <div class="hide">
+            @using (Html.BeginForm("SpaceshipGameBS", "Home", FormMethod.Post))
+            {
+                @Html.TextBoxFor(c => c.HighScore, new { @class = "score2" })
+                <input type="submit" class="submit2" value="add" />
+            }
+        </div>
+
+    </div>
+</body>
+
+
+
+<script>
+    var xPos = 925;
+    var yPos = 800;
+    var fallingSpeed = 5;
+    var spaceshipSpeed = 15;
+    var nums = [1, 2, 3, 4, 5, 6, 7, 8];
+    var nums2 = [9, 10, 11, 12, 13, 14, 15, 16];
+    var leftVar = [17];
+    var genNums = [];
+    var list = [];
+    var list2 = [];
+    var leftPos = 0;
+    var counter = 0;
+    var savedScore = 0;
+    leftVar[0] = 0;
+    var started = false;
+    
+   
+    setInterval(function () {
+        if (started == true) {
+            counter++;
+            $(".score").html("Score:" + counter)
+            $(".score2").val(counter)
+            localStorage.setItem("SAVED", counter);
+        }
+        if (counter >= 500) {
+            fallingSpeed = 1;
+
+        }
+        if (counter >= 1000) {
+            spaceshipSpeed = 10;
+        }
+    }, 100);
+
+    $(document).ready(function () {
+        savedScore = localStorage.getItem("SAVED");
+        if (savedScore != null) {
+            $(".score").html("Score:" + savedScore);
+        }
+        $(".spaceship").hide();
+        $(".submit").click(function () {
+            $(".submit").hide();
+            $(".exit").hide();
+            $(".scorelist").hide();
+            $(".spaceship").show();
+            started = true;
+            Start();
+        });
+        Start();
+        StartingPos();
+    });
+
+    function StartingPos() {
+        for (var i = 1; i <= 16; i++) {
+            if (i % 2 == 0) {
+                $(".p" + i).css("background-image", "url" + "(" + "/Images/im1.png" + ")");
+                $(".p" + i).css("top", 0);
+            }
+            else {
+                $(".p" + i).css("background-image", "url" + "(" + "/Images/im2.png" + ")");
+                $(".p" + i).css("top", 0);
+            }
+        }
+    }
+
+    function Start() {
+        if (started == true) {
+            DefaultPos();
+            RandomNumbers();
+
+        }
+    }
+
+    function DefaultPos() {
+        leftPos = 384;
+        for (var i = 1; i <= 8; i++) {
+            $(".p" + i).css("top", 0);
+            if (i == 1) {
+                $(".p" + i).css("left", leftPos);
+                leftVar[i] = leftPos;
+            }
+            else {
+                $(".p" + i).css("left", leftPos += 142);
+                leftVar[i] = leftPos;
+            }
+        }
+        leftPos = 384;
+        for (var i = 9; i <= 16; i++) {
+            $(".p" + i).css("top", 0);
+            if (i == 9) {
+                $(".p" + i).css("left", leftPos);
+                leftVar[i] = leftPos;
+            }
+            else {
+                $(".p" + i).css("left", leftPos += 142);
+                leftVar[i] = leftPos;
+            }
+        }
+    }
+
+    $(document).keydown(function (e) {
+        if (e.keyCode == 37 && xPos >= 390 && started == true) {
+            $(".spaceship").css("left", xPos -= spaceshipSpeed);
+        }
+        if (e.keyCode == 39 && xPos <= 1410 && started == true) {
+            $(".spaceship").css("left", xPos += spaceshipSpeed);
+
+        }
+    });
+
+    function RandomNumbers() {
+        list = []; genNums = [];
+        for (var i = 1; i <= 5; i++) {
+            list.push(get_rand(nums));
+        }
+        var c = 0;
+        list.delayedForEach(function (num) {
+            c++;
+            if (c == 5) {
+                Fall(num);
+                setTimeout(function () {
+                    RandomNumbers2();
+                }, 1600);
+
+            }
+            else {
+                Fall(num);
+            }
+        }, 1500);
+
+    }
+
+    function RandomNumbers2() {
+        list2 = []; genNums = [];
+
+
+        for (var i = 1; i <= 5; i++) {
+            list2.push(get_rand(nums2));
+        }
+        var c = 0;
+        list2.delayedForEach(function (num) {
+            c++;
+            if (c == 5) {
+                Fall(num);
+                setTimeout(function () {
+                    RandomNumbers();
+                }, 1600);
+
+            }
+            else {
+                Fall(num);
+            }
+        }, 1500);
+
+    }
+
+    function in_array(array, el) {
+        for (var i = 0; i < array.length; i++)
+            if (array[i] == el) return true;
+        return false;
+    }
+
+    function get_rand(array) {
+        var rand = array[Math.floor(Math.random() * array.length)];
+        if (!in_array(genNums, rand)) {
+            genNums.push(rand);
+            return rand;
+        }
+        return get_rand(array);
+    }
+
+    Array.prototype.delayedForEach = function (callback, timeout, thisArg, done) {
+        var i = 0,
+            l = this.length,
+            self = this;
+
+        var caller = function () {
+            callback.call(thisArg || self, self[i], i, self);
+            if (++i < l) {
+                setTimeout(caller, timeout);
+            } else if (done) {
+                setTimeout(done, timeout);
+            }
+        };
+
+        caller();
+    };
+
+    function Fall(e) {
+        $(".p" + e).css("top", 0);
+
+        var timeVar = 0;
+        var topVar = 0;
+        setInterval(function () {
+            if (started == true) {
+                if (timeVar < 930) {
+                    topVar += 1;
+                    $(".p" + e).css("top", topVar);
+                    timeVar++;
+
+                }
+                if (topVar >= 650 && topVar <= 780) {
+                    if (GetDistance(leftVar[e], topVar, xPos, yPos) == !false) {
+                        started = false;
+                        $(".submit2").click();
+                    }
+                }
+            }
+        }, fallingSpeed);
+    }
+
+    function GetDistance(x1, y1, x2, y2) {
+
+
+        return !(
+            ((y1 + 142) < (y2)) ||
+            (y1 > (y2 + 100)) ||
+            ((x1 + 142) < x2) ||
+            (x1 > (x2 + 100))
+        );
+    }
+</script>
